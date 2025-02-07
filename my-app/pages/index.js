@@ -1,114 +1,165 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+// components/RoseScene.jsx
+import { OrbitControls } from "@react-three/drei";
+import React, { useEffect, useState } from "react";
+import * as THREE from "three";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import { useLoader } from "@react-three/fiber";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import { useRef } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF, PositionalAudio } from "@react-three/drei";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+function CityScene({ ready }) {
+  return (
+    <Canvas
+      style={{
+        backgroundColor: "lightblue", // Light gray background
+        width: "100%",
+        height: "100dvh",
+      }} // Full screen canvas
+      camera={{ position: [0, 2, 20], fov: 40 }}
+    >
+      <fog attach="fog" args={["#cc7b32", 0, 500]} />
+      <CityModel ready={ready} />
+    </Canvas>
+  );
+}
 
-export default function Home() {
+function RoseScene() {
+  return (
+    <Canvas
+      style={{
+        backgroundColor: "#1b1b1b", // Light gray background
+        width: "100%",
+        height: "100dvh",
+      }} // Full screen canvas
+      camera={{ position: [0, 150, 250], fov: 100 }}
+      shadows
+      gl={{ alpha: false }}
+    >
+      {/* Lighting */}
+      <ambientLight intensity={0.8} color={"#ffffff"} />{" "}
+      {/* Ambient light with a white color */}
+      {/* Add a stronger directional light to simulate sunlight */}
+      <directionalLight
+        position={[10, 10, 10]}
+        intensity={0.9}
+        color={"#ffffff"}
+        castShadow
+      />
+      {/* Point light for local highlights */}
+      <pointLight
+        position={[5, 5, 5]}
+        intensity={0.8}
+        color={"#f0f0f0"}
+        castShadow
+      />
+      {/* Load and display the model */}
+      <RoseModel />
+      {/* Orbit Controls to move around the scene */}
+      <OrbitControls
+        autoRotate
+        autoRotateSpeed={10}
+        enableDamping
+        enablePan={false}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI / 2}
+      />
+    </Canvas>
+  );
+}
+
+function CityModel({ ready }) {
+  const group = useRef();
+  const { nodes, materials } = useGLTF("/scene-draco.glb");
+  useFrame(() => (group.current.rotation.y += 0.003));
+  return (
+    <group ref={group} scale={0.001} position={[0, 0, -100]} dispose={null}>
+      <group rotation={[-Math.PI / 2, 0, 0]}>
+        <group position={[-102253.52, -210688.86, -17050.52]}>
+          <mesh
+            material={materials.Scene_Root}
+            geometry={nodes.mesh_0.geometry}
+          />
+          <mesh
+            material={materials.Scene_Root}
+            geometry={nodes.mesh_1.geometry}
+          />
+          <mesh
+            material={materials.Scene_Root}
+            geometry={nodes.mesh_2.geometry}
+          />
+          <mesh
+            material={materials.Scene_Root}
+            geometry={nodes.mesh_3.geometry}
+          />
+        </group>
+        <group position={[100000, 120000, 2000]}>
+          {ready && (
+            <PositionalAudio
+              autoplay
+              loop
+              url="/zapsplat_icecream.mp3"
+              distance={3}
+            />
+          )}
+        </group>
+        <mesh position={[250000, -200000, 50000]}>
+          <sphereGeometry args={[30000, 32, 32]} />
+          <meshBasicMaterial color="#ff1020" />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+function RoseModel() {
+  const object = useLoader(OBJLoader, "/red_rose3.obj"); // Load the .obj model from the public folder
+  const [material, setMaterial] = useState(
+    new THREE.MeshStandardMaterial({
+      metalness: 0,
+      roughness: 0.8,
+      side: THREE.DoubleSide,
+    }),
+  );
+
+  useEffect(() => {
+    if (object) {
+      object.traverse((child) => {
+        if (child.isMesh) {
+          let newMaterial = material.clone();
+
+          // Set specific colors for different parts of the rose model
+          if (child.name === "rose") {
+            newMaterial.color.set("crimson");
+          } else if (child.name === "calyx") {
+            newMaterial.color.set("#001a14");
+          } else if (child.name === "leaf1" || child.name === "leaf2") {
+            newMaterial.color.set("#00331b");
+          }
+
+          child.material = newMaterial;
+        }
+      });
+      object.rotation.set(0, Math.PI / 1.7, 0); // Set the rotation of the object
+    }
+  }, [object, material]);
+
+  return <primitive object={object} />;
+}
+
+function Home() {
   return (
     <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
+      onClick={() => {
+        console.log("clicked");
+      }}
+      style={{ width: "100%", height: "100vh" }}
     >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              pages/index.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      {/* <CityScene /> */}
+      <RoseScene />
     </div>
   );
 }
+
+export default Home;
