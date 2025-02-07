@@ -1,5 +1,5 @@
 // components/RoseScene.jsx
-import { OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls } from "@react-three/drei";
 import React, { useEffect, useState } from "react";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
@@ -26,46 +26,77 @@ function CityScene({ ready }) {
 }
 
 function RoseScene() {
+  const [showWish, setShowWish] = useState(true);
+
+  if (showWish)
+    return (
+      <div className="w-full h-full bg-pink-100 text-2xl p-4 text-center flex flex-col great-vibes-font">
+        <p className="text-2xl font-bold mt-auto text-black">
+          You are the cutest petal in my life, the sweetest fragrance in my
+          world, and the only thorn I’d happily hug forever! 🌹
+        </p>
+        <br />
+        <p className="text-4xl font-bold text-black">
+          Love you more than bees love flowers! 💖{" "}
+        </p>
+        <button
+          className="text-white rounded-lg text-[100px] font-bold my-20 mb-auto animate-bounce duration-300"
+          onClick={() => setShowWish(false)}
+        >
+          🎁
+        </button>
+      </div>
+    );
+
   return (
-    <Canvas
-      style={{
-        backgroundColor: "#1b1b1b", // Light gray background
-        width: "100%",
-        height: "100dvh",
-      }} // Full screen canvas
-      camera={{ position: [0, 150, 250], fov: 100 }}
-      shadows
-      gl={{ alpha: false }}
-    >
-      {/* Lighting */}
-      <ambientLight intensity={0.8} color={"#ffffff"} />{" "}
-      {/* Ambient light with a white color */}
-      {/* Add a stronger directional light to simulate sunlight */}
-      <directionalLight
-        position={[10, 10, 10]}
-        intensity={0.9}
-        color={"#ffffff"}
-        castShadow
-      />
-      {/* Point light for local highlights */}
-      <pointLight
-        position={[5, 5, 5]}
-        intensity={0.8}
-        color={"#f0f0f0"}
-        castShadow
-      />
-      {/* Load and display the model */}
-      <RoseModel />
-      {/* Orbit Controls to move around the scene */}
-      <OrbitControls
-        autoRotate
-        autoRotateSpeed={10}
-        enableDamping
-        enablePan={false}
-        minPolarAngle={0}
-        maxPolarAngle={Math.PI / 2}
-      />
-    </Canvas>
+    <>
+      <Canvas
+        style={{
+          backgroundColor: "#1b1b1b", // Light gray background
+          width: "100%",
+          height: "100dvh",
+        }} // Full screen canvas
+        camera={{ position: [0, 150, 250], fov: 100 }}
+        shadows
+        gl={{ alpha: false }}
+      >
+        {/* add a cross button to close the wish */}
+        {/* Lighting */}
+        <ambientLight intensity={0.8} color={"#ffffff"} />{" "}
+        {/* Ambient light with a white color */}
+        {/* Add a stronger directional light to simulate sunlight */}
+        <directionalLight
+          position={[10, 10, 10]}
+          intensity={0.9}
+          color={"#ffffff"}
+          castShadow
+        />
+        {/* Point light for local highlights */}
+        <pointLight
+          position={[5, 5, 5]}
+          intensity={0.8}
+          color={"#f0f0f0"}
+          castShadow
+        />
+        {/* Load and display the model */}
+        <RoseModel />
+        {/* Orbit Controls to move around the scene */}
+        <OrbitControls
+          autoRotate
+          autoRotateSpeed={10}
+          enableDamping
+          enablePan={false}
+          minPolarAngle={0}
+          maxPolarAngle={Math.PI / 2}
+        />
+      </Canvas>
+      <button
+        className="absolute top-0 right-0 m-4 p-2 text-white rounded-lg text-3xl font-bold"
+        onClick={() => setShowWish(true)}
+      >
+        x
+      </button>
+    </>
   );
 }
 
