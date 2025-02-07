@@ -52,13 +52,13 @@ function RoseScene() {
     <>
       <Canvas
         style={{
-          backgroundColor: "#1b1b1b", // Light gray background
+          backgroundColor: "#f8bbd0", // Light gray background
           width: "100%",
           height: "100dvh",
         }} // Full screen canvas
         camera={{ position: [0, 150, 250], fov: 100 }}
         shadows
-        gl={{ alpha: false }}
+        gl={{ alpha: true }}
       >
         {/* add a cross button to close the wish */}
         {/* Lighting */}
@@ -91,7 +91,7 @@ function RoseScene() {
         />
       </Canvas>
       <button
-        className="absolute top-0 right-0 m-4 p-2 text-white rounded-lg text-3xl font-bold"
+        className="absolute top-0 right-0 m-4 p-2 text-black rounded-lg text-6xl font-extralight"
         onClick={() => setShowWish(true)}
       >
         x
